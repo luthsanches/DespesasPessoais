@@ -1,5 +1,7 @@
+import 'package:expenses/components/adaptative_textfield.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'adaptative_date_picker.dart';
+import 'adaptative_button.dart';
 
 class TransactionForm extends StatefulWidget {
   final void Function(String, double, DateTime) onSubmit;
@@ -26,83 +28,54 @@ class _TransactionFormState extends State<TransactionForm> {
     widget.onSubmit(title, value, _selectedDate);
   }
 
-  _showDatePicker() {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2019),
-      lastDate: DateTime.now(), 
-    ).then((pickedDate) {
-      if (pickedDate == null) {
-        return;
-      }
-
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: _titleController,
-              onSubmitted: (_) => _submitForm(),
-              decoration: InputDecoration(
-                labelText: 'Título',
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 10,
+            right: 10,
+            top: 10,
+            bottom: 10,
+          ),
+          child: Column(
+            children: <Widget>[
+              AdaptativeTextField(
+                controller: _titleController,
+                submit: (_) => _submitForm(),
+                label: 'Título',
+                typeInput: TextInputType.text,
               ),
-            ),
-            TextField(
-              controller: _valueController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              onSubmitted: (_) => _submitForm(),
-              decoration: InputDecoration(
-                labelText: 'Valor R\$',
+              AdaptativeTextField(
+                controller: _valueController,
+                submit: (_) => _submitForm(),
+                label: 'Valor R\$',
+                typeInput: TextInputType.numberWithOptions(decimal: true),
               ),
-            ),
-            Container(
-              height: 70,
-              child: Row(
-                children: [
-                  Text(_selectedDate == null
-                      ? 'Nenhuma data selecionada!'
-                      : DateFormat('dd/MM/yyyy').format(_selectedDate)),
-                  FlatButton(
-                    textColor: Theme.of(context).primaryColor,
-                    child: Text(
-                      'Selecionar Data',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: _showDatePicker,
+              AdaptativeDatePicker(
+                dataSelecionada: _selectedDate,
+                onDateChanged: (newDate) => {
+                  setState(() {
+                    _selectedDate = newDate;
+                  }),
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  AdaptativeButton(
+                    label: 'Adicionar Transação',
+                    onPressed: _submitForm,
                   ),
+                  
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                RaisedButton(
-                  child: Text(
-                    'Adicionar Transação',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  textColor: Theme.of(context).textTheme.button.color,
-                  color: Theme.of(context).primaryColor,
-                  onPressed: _submitForm,
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
